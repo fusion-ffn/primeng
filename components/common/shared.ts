@@ -87,6 +87,7 @@ export class Column implements AfterContentInit{
     @Input() selectionMode: string;
     @Input() filterPlaceholder: string;
     @Input() frozen: boolean;
+    @Input() resizable: boolean;
     @Output() sortFunction: EventEmitter<any> = new EventEmitter();
     @ContentChildren(PrimeTemplate) templates: QueryList<any>;
     @ContentChild(TemplateRef) template: TemplateRef<any>;
