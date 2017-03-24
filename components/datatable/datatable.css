@@ -1,5 +1,7 @@
 .ui-datatable {
     position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .ui-datatable table {
@@ -67,6 +69,8 @@
 
 /* Scrollable */
 .ui-datatable-scrollable-body {
+    max-width: 100%;
+    max-height: 100%;
     overflow:auto;
 }
 .ui-datatable-scrollable-header {
@@ -157,7 +161,7 @@
 
 .ui-datatable-resizable {
     padding-bottom: 1px;     /*fix for webkit overlow*/
-    overflow:auto;
+    /*overflow:auto;*/
 }
 
 .ui-datatable-resizable thead th,
@@ -259,10 +263,14 @@
 
 .ui-datatable-scrollable-wrapper {
     position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .ui-datatable-scrollable-view {
-    
+    position: relative;
+    width: 100%;
+    height: 100%;
 }
 
 .ui-datatable-frozen-view .ui-datatable-scrollable-body {
