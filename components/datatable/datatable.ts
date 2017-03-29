@@ -1581,11 +1581,11 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
             else if(this.columnResizeMode === 'expand') {
                 this.tbody.parentElement.style.width = this.tbody.parentElement.offsetWidth + delta + 'px';
                 this.resizeColumn.style.width = newColumnWidth + 'px';
-                let containerWidth = this.tbody.parentElement.style.width - delta;
+                let containerWidth = parseInt(this.tbody.parentElement.style.width, 10) - delta;
                 
                 if(this.scrollable) {
                     this.scrollBarWidth = this.scrollBarWidth||this.domHandler.calculateScrollbarWidth();
-                    this.el.nativeElement.children[0].style.width = parseFloat(containerWidth) + this.scrollBarWidth + 'px';
+                    this.el.nativeElement.children[0].style.width = containerWidth + this.scrollBarWidth + 'px';
                     let colGroup = this.domHandler.findSingle(this.el.nativeElement, 'colgroup.ui-datatable-scrollable-colgroup');
                     let resizeColumnIndex = this.domHandler.index(this.resizeColumn);
                     colGroup.children[resizeColumnIndex].style.width = newColumnWidth + 'px';
@@ -1609,15 +1609,17 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
     }
     
     fixColumnWidths() {
-        /*let columns = this.domHandler.find(this.el.nativeElement, 'th.ui-resizable-column');
-        columns.forEach((col, i) => {
-            col.style.width = i === columns.length - 1 ? '100%' : col.offsetWidth + 'px';
-        });
+        let columns = this.domHandler.find(this.el.nativeElement, 'th.ui-resizable-column');
+        let colGroup = this.domHandler.findSingle(this.el.nativeElement, 'colgroup.ui-datatable-scrollable-colgroup');
 
-        if(this.scrollable) {
-            let colGroup = this.domHandler.findSingle(this.el.nativeElement, 'colgroup.ui-datatable-scrollable-colgroup');
-            colGroup.children[colGroup.children.length - 1].style.width = '100%';
-        }*/
+        let i = 0;
+        for (let col of columns) {
+            col.style.width = i === columns.length - 1 ? '100%' : col.offsetWidth + 'px';
+            if(colGroup && colGroup.children[i]) {
+                colGroup.children[i].style.width = col.style.width;
+            }
+            i++;
+        }
     }
     
     updateScrollTableWidth(delta: number): void {
@@ -1645,7 +1647,7 @@ export class DataTable implements AfterViewChecked,AfterViewInit,AfterContentIni
                 scrollTable.style.width = minWidth + 'px';
             }
             
-            return minWidth > 120;
+            return minWidth > 0;
         }
 
         return false;
