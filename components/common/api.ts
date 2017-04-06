@@ -25,6 +25,7 @@ export interface FilterMetadata {
 
 export interface MenuItem {
     label?: string;
+    tooltip?: string;
     icon?: string;
     command?: (event?: any) => void;
     url?: string;

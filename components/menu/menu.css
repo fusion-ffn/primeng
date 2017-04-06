@@ -118,6 +118,19 @@
 .ui-menubar .ui-menubar-options {
     float: right;
 }
+
+.ui-vertical-splitter {
+    width: 1px;
+    border-left: 1px solid #000;
+}
+
+.ui-horizontal-splitter {
+    border-top: 1px solid #000;
+}
+
+.ui-splitter-item {
+    vertical-align: middle;
+}
            
 /** SlideMenu **/
 .ui-slidemenu .ui-slidemenu-wrapper {

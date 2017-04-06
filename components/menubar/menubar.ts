@@ -4,6 +4,7 @@ import {DomHandler} from '../dom/domhandler';
 import {MenuItem} from '../common/api';
 import {Location} from '@angular/common';
 import {Router} from '@angular/router';
+import {TooltipModule} from './../tooltip/tooltip';
 
 @Component({
     selector: 'p-menubarSub',
@@ -11,16 +12,23 @@ import {Router} from '@angular/router';
         <ul [ngClass]="{'ui-menubar-root-list ui-helper-clearfix':root, 'ui-widget-content ui-corner-all ui-helper-clearfix ui-menu-child ui-shadow':!root}" class="ui-menu-list"
             (click)="listClick($event)">
             <template ngFor let-child [ngForOf]="(root ? item : item.items)">
-                <li #item [ngClass]="{'ui-menuitem ui-widget ui-corner-all':true,'ui-menu-parent':child.items,'ui-menuitem-active':item==activeItem}"
-                    (mouseenter)="onItemMouseEnter($event,item,child)" (mouseleave)="onItemMouseLeave($event,item)">
-                    <a #link [href]="child.url||'#'" class="ui-menuitem-link ui-corner-all" 
-                        [ngClass]="{'ui-state-disabled':child.disabled}" (click)="itemClick($event, child)">
-                        <span class="ui-submenu-icon fa fa-fw" *ngIf="child.items" [ngClass]="{'fa-caret-down':root,'fa-caret-right':!root}"></span>
-                        <span class="ui-menuitem-icon fa fa-fw" *ngIf="child.icon" [ngClass]="child.icon"></span>
-                        <span class="ui-menuitem-text">{{child.label}}</span>
-                    </a>
-                    <p-menubarSub class="ui-submenu" [item]="child" *ngIf="child.items"></p-menubarSub>
-                </li>
+                <ng-container *ngIf="!isSeparator(child)">
+                    <li #item [pTooltip]="child.tooltip" [tooltipPosition]="getTooltipPosition()" [ngClass]="{'ui-menuitem ui-widget ui-corner-all':true,'ui-menu-parent':child.items,'ui-menuitem-active':item==activeItem}"
+                        (mouseenter)="onItemMouseEnter($event,item,child)" (mouseleave)="onItemMouseLeave($event,item)">
+                        <a #link [href]="child.url||'#'" class="ui-menuitem-link ui-corner-all" 
+                            [ngClass]="{'ui-state-disabled':child.disabled}" (click)="itemClick($event, child)">
+                            <span class="ui-submenu-icon fa fa-fw" *ngIf="child.items" [ngClass]="{'fa-caret-down':root,'fa-caret-right':!root}"></span>
+                            <span class="ui-menuitem-icon fa fa-fw" *ngIf="child.icon" [ngClass]="child.icon"></span>
+                            <span class="ui-menuitem-text">{{child.label}}</span>
+                        </a>
+                        <p-menubarSub class="ui-submenu" [item]="child" [level]="level + 1" *ngIf="child.items"></p-menubarSub>
+                    </li>
+                </ng-container>
+                <ng-container *ngIf="isSeparator(child)">
+                    <li [ngClass]="{'ui-menuitem ui-widget ui-splitter-item ui-corner-all':true}">
+                        <div  [ngClass]="{'ui-vertical-splitter':root, 'ui-horizontal-splitter':!root}"></div>
+                    </li>
+                </ng-container>
             </template>
         </ul>
     `,
@@ -31,6 +39,8 @@ export class MenubarSub {
     @Input() item: MenuItem;
     
     @Input() root: boolean;
+
+    @Input() level: number;
     
     constructor(public domHandler: DomHandler, public router: Router) {}
     
@@ -56,6 +66,25 @@ export class MenubarSub {
                 sublist.style.left = this.domHandler.getOuterWidth(item.children[0]) + 'px';
             }
         }
+    }
+
+    getTooltipPosition(): string {
+        if (this.root) {
+            return 'top';
+        }
+
+        if (this.level === 1) {
+            return 'left';
+        }
+
+        return 'top';
+    }
+
+    isSeparator(child: MenuItem): boolean {
+        if (!child.label) {
+            return false;
+        }
+        return child.label.localeCompare('-') === 0;
     }
     
     onItemMouseLeave(event, link) {
@@ -102,7 +131,7 @@ export class MenubarSub {
     template: `
         <div [ngClass]="{'ui-menubar ui-menu ui-widget ui-widget-content ui-corner-all ui-helper-clearfix':true}" 
             [class]="styleClass" [ngStyle]="style">
-            <p-menubarSub [item]="model" root="root"></p-menubarSub>
+            <p-menubarSub [item]="model" [level]="0" root="root"></p-menubarSub>
         </div>
     `,
     providers: [DomHandler]
@@ -140,7 +169,7 @@ export class Menubar implements OnDestroy {
 }
 
 @NgModule({
-    imports: [CommonModule],
+    imports: [CommonModule, TooltipModule],
     exports: [Menubar],
     declarations: [Menubar,MenubarSub]
 })
