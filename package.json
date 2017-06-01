@@ -1,6 +1,6 @@
 {
   "name": "primeng-p8",
-  "version": "2.0.9",
+  "version": "2.0.10",
   "scripts": {
     "tsc": "tsc",
     "tsc:w": "tsc -w",
