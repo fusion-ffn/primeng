@@ -9,7 +9,7 @@ var gulp = require('gulp'),
     
 gulp.task('build-css', function() {
 	gulp.src([
-        'components/common/common.css',
+        'src/app/components/common/common.css',
 		'components/**/*.css'
     ])
 	.pipe(concat('primeng.css'))
@@ -18,8 +18,8 @@ gulp.task('build-css', function() {
 
 gulp.task('build-css-prod', function() {
     gulp.src([
-        'components/common/common.css',
-		'components/**/*.css'
+        'src/app/components/common/common.css',
+		'src/app/components/**/*.css'
     ])
 	.pipe(concat('primeng.css'))
 	.pipe(gulp.dest('resources'))
@@ -30,7 +30,7 @@ gulp.task('build-css-prod', function() {
 
 //Building images
 gulp.task('images', function() {
-    return gulp.src(['components/**/images/*.png', 'components/**/images/*.gif'])
+    return gulp.src(['src/app/components/**/images/*.png', 'components/**/images/*.gif'])
         .pipe(flatten())
         .pipe(gulp.dest('resources/images'));
 });
