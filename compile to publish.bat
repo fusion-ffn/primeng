@@ -9,8 +9,8 @@ ECHO compilation done
 
 ECHO copy files to publish folder
 ECHO resources
-call xcopy "components" "..\publish\components\" /sy
-call xcopy "src\app\components\*.ts" "..\publish\components\" /sy
+call xcopy "components" "..\publish\src\app\components\" /sy
+call xcopy "src\app\components\*.ts" "..\publish\src\app\components\" /sy
 call xcopy resources "..\publish\resources\" /E /Q
 
 ECHO json
