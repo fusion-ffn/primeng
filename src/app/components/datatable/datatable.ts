@@ -523,6 +523,8 @@ export class DataTable implements AfterViewChecked, AfterViewInit, AfterContentI
 
     @Output() onColResize: EventEmitter<any> = new EventEmitter();
 
+    @Output() onColResizeStart: EventEmitter<any> = new EventEmitter();
+
     @Input() reorderableColumns: boolean;
 
     @Output() onColReorder: EventEmitter<any> = new EventEmitter();
@@ -1708,7 +1710,9 @@ export class DataTable implements AfterViewChecked, AfterViewInit, AfterContentI
         if (event.pageX > containerLeft && event.pageX < (containerLeft + container.offsetWidth)) {
             this.resizerHelper.style.left = (event.pageX - containerLeft) + 'px';
         }
-
+        this.onColResizeStart.emit({
+                element: this.resizeColumn
+            });
         this.resizerHelper.style.display = 'block';
     }
 
