@@ -1,4 +1,4 @@
-import {NgModule,Component,ElementRef,AfterViewInit,OnDestroy,Input,Output,EventEmitter,Renderer2,ContentChild,ViewChild} from '@angular/core';
+import {NgModule,Component,ElementRef,AfterViewInit,AfterViewChecked,OnDestroy,Input,Output,EventEmitter,Renderer2,ContentChild,ViewChild} from '@angular/core';
 import {trigger,state,style,transition,animate} from '@angular/animations';
 import {CommonModule} from '@angular/common';
 import {DomHandler} from '../dom/domhandler';
@@ -43,7 +43,7 @@ import {Header,Footer,SharedModule} from '../common/shared';
     ],
     providers: [DomHandler]
 })
-export class Dialog implements AfterViewInit,OnDestroy {
+export class Dialog implements AfterViewInit,AfterViewChecked,OnDestroy {
 
     @Input() header: string;
 
@@ -130,6 +130,10 @@ export class Dialog implements AfterViewInit,OnDestroy {
     closeIconMouseDown: boolean;
     
     preWidth: number;
+    
+    preventVisibleChangePropagation: boolean;
+    
+    executePostDisplayActions: boolean;
                 
     constructor(public el: ElementRef, public domHandler: DomHandler, public renderer: Renderer2) {}
     
@@ -143,14 +147,25 @@ export class Dialog implements AfterViewInit,OnDestroy {
         if(this.containerViewChild && this.containerViewChild.nativeElement) {
             if(this._visible)
                 this.show();
-            else
-                this.hide();
+            else {
+                if(this.preventVisibleChangePropagation)
+                    this.preventVisibleChangePropagation = false;
+                else
+                    this.hide();
+            }
         }
+    }
+    
+    ngAfterViewChecked() {
+        if(this.executePostDisplayActions) {
+            this.onShow.emit({});
+            this.positionOverlay();
+            this.executePostDisplayActions = false;
+        } 
     }
 
     show() {
-        this.onShow.emit({});
-        this.positionOverlay();
+        this.executePostDisplayActions = true;
         this.containerViewChild.nativeElement.style.zIndex = String(++DomHandler.zindex);
         this.bindGlobalListeners();
         
@@ -158,7 +173,7 @@ export class Dialog implements AfterViewInit,OnDestroy {
             this.enableModality();
         }
     }
-    
+        
     positionOverlay() {
         if(this.positionLeft >= 0 && this.positionTop >= 0) {
             this.containerViewChild.nativeElement.style.left = this.positionLeft + 'px';
@@ -176,6 +191,7 @@ export class Dialog implements AfterViewInit,OnDestroy {
     hide() {
         this.onHide.emit({});
         this.unbindMaskClickListener();
+        this.unbindGlobalListeners();
         
         if(this.modal) {
             this.disableModality();
@@ -183,6 +199,7 @@ export class Dialog implements AfterViewInit,OnDestroy {
     }
     
     close(event: Event) {
+        this.preventVisibleChangePropagation = true;
         this.hide();
         this.visibleChange.emit(false);
         event.preventDefault();
@@ -232,12 +249,14 @@ export class Dialog implements AfterViewInit,OnDestroy {
 	             });
 			}
             document.body.appendChild(this.mask);
+            this.domHandler.addClass(document.body, 'ui-overflow-hidden');
         }
     }
     
     disableModality() {
         if(this.mask) {
             document.body.removeChild(this.mask);
+            this.domHandler.removeClass(document.body, 'ui-overflow-hidden');
             this.mask = null;
         }
     }
@@ -344,6 +363,9 @@ export class Dialog implements AfterViewInit,OnDestroy {
     
     unbindGlobalListeners() {
         this.unbindDocumentDragListener();
+        this.unbindDocumentResizeListeners();
+        this.unbindDocumentResponsiveListener();
+        this.unbindDocumentEscapeListener();
     }
     
     bindDocumentDragListener() {
@@ -398,7 +420,7 @@ export class Dialog implements AfterViewInit,OnDestroy {
         });
     }
     
-    unbindDocumentResponseListener() {
+    unbindDocumentResponsiveListener() {
         if(this.documentResponsiveListener) {
             this.documentResponsiveListener();
             this.documentResponsiveListener = null;

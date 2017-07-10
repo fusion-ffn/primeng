@@ -345,6 +345,7 @@ var DataTable = (function () {
         this.onLazyLoad = new core_1.EventEmitter();
         this.columnResizeMode = 'fit';
         this.onColResize = new core_1.EventEmitter();
+        this.onColResizeStart = new core_1.EventEmitter();
         this.onColReorder = new core_1.EventEmitter();
         this.sortMode = 'single';
         this.sortOrder = 1;
@@ -1224,6 +1225,9 @@ var DataTable = (function () {
         if (event.pageX > containerLeft && event.pageX < (containerLeft + container.offsetWidth)) {
             this.resizerHelper.style.left = (event.pageX - containerLeft) + 'px';
         }
+        this.onColResizeStart.emit({
+            element: this.resizeColumn
+        });
         this.resizerHelper.style.display = 'block';
     };
     DataTable.prototype.onColumnResizeEnd = function (event) {
@@ -1695,6 +1699,10 @@ __decorate([
     core_1.Output(),
     __metadata("design:type", core_1.EventEmitter)
 ], DataTable.prototype, "onColResize", void 0);
+__decorate([
+    core_1.Output(),
+    __metadata("design:type", core_1.EventEmitter)
+], DataTable.prototype, "onColResizeStart", void 0);
 __decorate([
     core_1.Input(),
     __metadata("design:type", Boolean)
